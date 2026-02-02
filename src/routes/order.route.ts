@@ -11,7 +11,6 @@ import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-// All routes require authentication
 router.post("/", authMiddleware, createOrder);
 router.get("/", authMiddleware, getUserOrders);
 router.get("/current", authMiddleware, getCurrentOrders);
