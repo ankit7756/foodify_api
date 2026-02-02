@@ -2,7 +2,6 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, "../../uploads/profiles");
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
@@ -14,7 +13,6 @@ const storage = multer.diskStorage({
         cb(null, uploadsDir);
     },
     filename: (req, file, cb) => {
-        // Generate unique filename: userId_timestamp.ext
         const userId = (req as any).userId || "unknown";
         const uniqueSuffix = Date.now();
         const ext = path.extname(file.originalname);
