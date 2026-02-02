@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { RestaurantModel } from "../models/Restaurant.model";
 
-// Get all restaurants
 export const getAllRestaurants = async (req: Request, res: Response) => {
     try {
         const restaurants = await RestaurantModel.find({ isOpen: true })
