@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// order item sub-schema
 const orderItemSchema = new mongoose.Schema({
     foodId: {
         type: mongoose.Schema.Types.ObjectId,
