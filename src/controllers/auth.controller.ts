@@ -87,9 +87,81 @@ export const getProfile = async (req: Request, res: Response) => {
     }
 };
 
+// export const updateProfile = async (req: Request, res: Response) => {
+//     try {
+//         const userId = (req as any).userId;
+//         const { fullName, username, phone } = req.body;
+
+//         const user = await UserModel.findById(userId);
+
+//         if (!user) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "User not found"
+//             });
+//         }
+
+//         // Update fields if provided
+//         if (fullName) user.fullName = fullName;
+//         if (username) user.username = username;
+//         if (phone) user.phone = phone;
+
+//         // Handle profile image update
+//         if (req.file) {
+//             // Delete old image if exists
+//             if (user.profileImage) {
+//                 const oldImagePath = path.join(__dirname, "../../uploads/profiles", user.profileImage);
+//                 if (fs.existsSync(oldImagePath)) {
+//                     fs.unlinkSync(oldImagePath);
+//                 }
+//             }
+
+//             user.profileImage = req.file.filename;
+//         }
+
+//         await user.save();
+
+//         // 🆕 Dynamic base URL
+//         let profileImageUrl = null;
+//         if (user.profileImage) {
+//             profileImageUrl = `${BASE_URL}/uploads/profiles/${user.profileImage}`;
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             message: "Profile updated successfully",
+//             data: {
+//                 id: user._id,
+//                 fullName: user.fullName,
+//                 username: user.username,
+//                 email: user.email,
+//                 phone: user.phone,
+//                 profileImage: profileImageUrl,
+//                 role: user.role
+//             }
+//         });
+//     } catch (error: any) {
+//         res.status(500).json({
+//             success: false,
+//             message: error.message
+//         });
+//     }
+// };
+
 export const updateProfile = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).userId;
+        // 🔄 CHANGE: Get ID from params instead of token
+        const userId = req.params.id;
+        const loggedInUserId = (req as any).userId;
+
+        // Security: Users can only update their own profile (unless admin in future)
+        if (userId !== loggedInUserId) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only update your own profile"
+            });
+        }
+
         const { fullName, username, phone } = req.body;
 
         const user = await UserModel.findById(userId);
@@ -121,7 +193,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
         await user.save();
 
-        // 🆕 Dynamic base URL
+        // Dynamic base URL
         let profileImageUrl = null;
         if (user.profileImage) {
             profileImageUrl = `${BASE_URL}/uploads/profiles/${user.profileImage}`;
