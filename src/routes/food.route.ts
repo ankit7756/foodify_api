@@ -6,6 +6,7 @@ import {
     getPopularFoods,
 } from "../controllers/food.controller";
 
+// Food routes
 const router = express.Router();
 
 router.get("/", getAllFoods);
