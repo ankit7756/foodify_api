@@ -10,7 +10,6 @@ interface JwtPayload {
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
-        // Get token from Authorization header
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
