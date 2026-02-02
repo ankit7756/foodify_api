@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Food Schema
 const foodSchema = new mongoose.Schema({
     restaurantId: {
         type: mongoose.Schema.Types.ObjectId,
