@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.route";
 import restaurantRoutes from "./routes/restaurant.route";
 import foodRoutes from "./routes/food.route";
 import orderRoutes from "./routes/order.route";
+import adminUserRoutes from "./routes/admin/user.route";
 import path from "path";
 import { PORT } from "./config";
 
@@ -28,6 +29,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/foods", foodRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin/users", adminUserRoutes);
 
 
 const start = async () => {
