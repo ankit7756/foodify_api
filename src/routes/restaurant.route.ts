@@ -5,6 +5,7 @@ import {
     searchRestaurants,
 } from "../controllers/restaurant.controller";
 
+// Restaurant routes
 const router = express.Router();
 
 router.get("/", getAllRestaurants);
