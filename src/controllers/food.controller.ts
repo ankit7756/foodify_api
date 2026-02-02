@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { FoodModel } from "../models/Food.model";
 
-// Get all foods
 export const getAllFoods = async (req: Request, res: Response) => {
     try {
         const foods = await FoodModel.find({ isAvailable: true })
