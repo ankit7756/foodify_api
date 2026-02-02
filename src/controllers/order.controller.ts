@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { OrderModel } from "../models/Order.model";
 
-// Create new order
 export const createOrder = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).userId; // From auth middleware
+        const userId = (req as any).userId;
 
         const {
             restaurantId,
