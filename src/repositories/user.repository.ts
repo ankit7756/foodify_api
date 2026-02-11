@@ -1,4 +1,5 @@
 import { UserModel } from "../models/User.model";
+import { QueryFilter } from "mongoose";
 
 export const getUserByEmail = async (email: string) => {
     return await UserModel.findOne({ email });
@@ -13,13 +14,35 @@ export const createUser = async (userData: any) => {
     return await user.save();
 };
 
-// 🆕 ADD THESE METHODS
 export const getUserById = async (id: string) => {
     return await UserModel.findById(id);
 };
 
-export const getAllUsers = async () => {
-    return await UserModel.find().select("-password");
+export const getAllUsers = async (
+    page: number,
+    size: number,
+    search?: string
+): Promise<{ users: any[], total: number }> => {
+    const filter: QueryFilter<any> = {};
+
+    if (search) {
+        filter.$or = [
+            { username: { $regex: search, $options: 'i' } },
+            { email: { $regex: search, $options: 'i' } },
+            { fullName: { $regex: search, $options: 'i' } },
+        ];
+    }
+
+    const [users, total] = await Promise.all([
+        UserModel.find(filter)
+            .select("-password")
+            .skip((page - 1) * size)
+            .limit(size)
+            .sort({ createdAt: -1 }),
+        UserModel.countDocuments(filter)
+    ]);
+
+    return { users, total };
 };
 
 export const updateUser = async (id: string, updateData: any) => {
