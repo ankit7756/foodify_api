@@ -23,3 +23,8 @@ dist
 .vscode
 .idea
 
+# Upload folders
+backend/uploads/
+backend/uploads/profiles/
+uploads/
+uploads/profiles/
