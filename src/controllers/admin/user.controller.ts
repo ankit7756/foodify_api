@@ -1,25 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import { AdminUserService } from "../../services/admin/user.service";
-import { UpdateUserDTO } from "../../dtos/user.dto";
 import { BASE_URL } from "../../config";
-import z from "zod";
+import { QueryParams } from "../../types/query.type";
 
 const adminUserService = new AdminUserService();
 
 export class AdminUserController {
-    // POST /api/admin/users - Create user
     async createUser(req: Request, res: Response, next: NextFunction) {
         try {
             const userData = req.body;
 
-            // Add image URL if uploaded
             if (req.file) {
                 userData.profileImage = req.file.filename;
             }
 
             const newUser = await adminUserService.createUser(userData);
 
-            // Format response with full image URL
             let profileImageUrl = null;
             if (newUser.profileImage) {
                 profileImageUrl = `${BASE_URL}/uploads/profiles/${newUser.profileImage}`;
@@ -27,7 +23,7 @@ export class AdminUserController {
 
             return res.status(201).json({
                 success: true,
-                message: "User created successfully",
+                message: "User Created",
                 data: {
                     ...newUser.toObject(),
                     profileImage: profileImageUrl
@@ -41,12 +37,14 @@ export class AdminUserController {
         }
     }
 
-    // GET /api/admin/users - Get all users
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            const users = await adminUserService.getAllUsers();
+            const { page, size, search }: QueryParams = req.query;
+            const { users, pagination } = await adminUserService.getAllUsers(
+                page, size, search
+            );
 
-            // Format all users with full image URLs
+            // Format users with full image URLs
             const formattedUsers = users.map((user: any) => {
                 let profileImageUrl = null;
                 if (user.profileImage) {
@@ -61,7 +59,8 @@ export class AdminUserController {
             return res.status(200).json({
                 success: true,
                 data: formattedUsers,
-                message: "All users retrieved successfully"
+                pagination: pagination,
+                message: "All Users Retrieved"
             });
         } catch (error: any) {
             return res.status(error.statusCode ?? 500).json({
@@ -71,10 +70,9 @@ export class AdminUserController {
         }
     }
 
-    // GET /api/admin/users/:id - Get single user
     async getUserById(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.params.id;
+            const userId = req.params.id as string;
             const user = await adminUserService.getUserById(userId);
 
             let profileImageUrl = null;
@@ -88,7 +86,7 @@ export class AdminUserController {
                     ...(user as any).toObject(),
                     profileImage: profileImageUrl
                 },
-                message: "User retrieved successfully"
+                message: "Single User Retrieved"
             });
         } catch (error: any) {
             return res.status(error.statusCode ?? 500).json({
@@ -98,23 +96,11 @@ export class AdminUserController {
         }
     }
 
-    // PUT /api/admin/users/:id - Update user
     async updateUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.params.id;
-            const parsedData = UpdateUserDTO.safeParse(req.body);
+            const userId = req.params.id as string;
+            const updateData = req.body;
 
-            if (!parsedData.success) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Validation failed",
-                    errors: parsedData.error.format()
-                });
-            }
-
-            const updateData = parsedData.data;
-
-            // Add image if uploaded
             if (req.file) {
                 updateData.profileImage = req.file.filename;
             }
@@ -128,7 +114,7 @@ export class AdminUserController {
 
             return res.status(200).json({
                 success: true,
-                message: "User updated successfully",
+                message: "User Updated",
                 data: {
                     ...(updatedUser as any).toObject(),
                     profileImage: profileImageUrl
@@ -142,10 +128,9 @@ export class AdminUserController {
         }
     }
 
-    // DELETE /api/admin/users/:id - Delete user
     async deleteUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.params.id;
+            const userId = req.params.id as string;
             const deleted = await adminUserService.deleteUser(userId);
 
             if (!deleted) {
@@ -157,7 +142,7 @@ export class AdminUserController {
 
             return res.status(200).json({
                 success: true,
-                message: "User deleted successfully"
+                message: "User Deleted"
             });
         } catch (error: any) {
             return res.status(error.statusCode ?? 500).json({
