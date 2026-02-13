@@ -29,7 +29,7 @@ describe('Password Reset Integration Tests', () => {
 
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('success', true);
-        });
+        }, 10000); // ✅ FIXED: 10 second timeout for email sending
 
         test('should handle non-existent email', async () => {
             const response = await request(app)
@@ -37,6 +37,40 @@ describe('Password Reset Integration Tests', () => {
                 .send({ email: 'nonexistent@test.com' });
 
             expect(response.status).toBe(404);
+        });
+
+        describe('POST /api/auth/reset-password/:token', () => {
+            test('should reset password with valid token', async () => {
+                // First request a reset
+                const resetRequest = await request(app)
+                    .post('/api/auth/request-password-reset')
+                    .send({ email: testUser.email });
+
+                expect(resetRequest.status).toBe(200);
+
+                // In real scenario, token would come from email
+                // For testing, we'll generate a valid token
+                const jwt = require('jsonwebtoken');
+                const user = await UserModel.findOne({ email: testUser.email });
+                const token = jwt.sign({ id: user?._id }, process.env.JWT_SECRET || 'foodify_secret_key', { expiresIn: '1h' });
+
+                // Now reset password
+                const response = await request(app)
+                    .post(`/api/auth/reset-password/${token}`)
+                    .send({ newPassword: 'NewPassword123!' });
+
+                expect(response.status).toBe(200);
+                expect(response.body).toHaveProperty('success', true);
+            }, 10000);
+
+            test('should not reset password with invalid token', async () => {
+                const response = await request(app)
+                    .post('/api/auth/reset-password/invalid-token')
+                    .send({ newPassword: 'NewPassword123!' });
+
+                expect(response.status).toBe(400);
+                expect(response.body).toHaveProperty('success', false);
+            });
         });
     });
 });

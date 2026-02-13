@@ -11,14 +11,15 @@ export const transporter = nodemailer.createTransport({
     },
 });
 
-// Verify connection on startup
-transporter.verify((error, success) => {
-    if (error) {
-        console.log('❌ Email service error:', error);
-    } else {
-        console.log('✅ Email service ready');
-    }
-});
+if (process.env.NODE_ENV !== 'test') {
+    transporter.verify((error, success) => {
+        if (error) {
+            console.log('❌ Email service error:', error);
+        } else {
+            console.log('✅ Email service ready');
+        }
+    });
+}
 
 export const sendEmail = async (to: string, subject: string, html: string) => {
     const mailOptions = {
