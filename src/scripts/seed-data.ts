@@ -6,11 +6,9 @@ const seedData = async () => {
     try {
         await connectDB();
 
-        // Clear existing data
         await RestaurantModel.deleteMany({});
         await FoodModel.deleteMany({});
 
-        // Create Restaurants
         const restaurants = await RestaurantModel.insertMany([
             {
                 name: "Pizza Hut",
@@ -72,11 +70,46 @@ const seedData = async () => {
                 phone: "01-4567894",
                 isOpen: true,
             },
+            {
+                name: "Momo Palace",
+                image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500",
+                description: "Nepal's finest momos — steamed, fried, and jhol momos made fresh daily.",
+                rating: 4.8,
+                deliveryTime: "20-30 mins",
+                deliveryFee: 35,
+                categories: ["Momo", "Nepali", "Snacks"],
+                address: "Thamel, Kathmandu",
+                phone: "01-4567895",
+                isOpen: true,
+            },
+            {
+                name: "Sushi World",
+                image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500",
+                description: "Authentic Japanese sushi, ramen, and bento boxes prepared by expert chefs.",
+                rating: 4.6,
+                deliveryTime: "40-50 mins",
+                deliveryFee: 80,
+                categories: ["Sushi", "Japanese", "Asian"],
+                address: "Lazimpat, Kathmandu",
+                phone: "01-4567896",
+                isOpen: true,
+            },
+            {
+                name: "The Grill House",
+                image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500",
+                description: "Premium grilled steaks, BBQ ribs, and smoked meats for the ultimate carnivore experience.",
+                rating: 4.5,
+                deliveryTime: "35-45 mins",
+                deliveryFee: 70,
+                categories: ["Grill", "BBQ", "Steak"],
+                address: "Jhamsikhel, Lalitpur",
+                phone: "01-4567897",
+                isOpen: true,
+            },
         ]);
 
         console.log("✅ Restaurants created:", restaurants.length);
 
-        // Create Foods for each restaurant
         const foods = [];
 
         // Pizza Hut Foods
@@ -109,6 +142,17 @@ const seedData = async () => {
                 price: 650,
                 category: "Pizza",
                 rating: 4.4,
+                isPopular: false,
+            },
+            {
+                restaurantId: restaurants[0]._id,
+                name: "BBQ Chicken Pizza",
+                image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500",
+                description: "Smoky BBQ sauce with grilled chicken and red onions.",
+                price: 800,
+                category: "Pizza",
+                rating: 4.8,
+                isPopular: true,
             }
         );
 
@@ -142,6 +186,17 @@ const seedData = async () => {
                 price: 350,
                 category: "Chicken",
                 rating: 4.3,
+                isPopular: false,
+            },
+            {
+                restaurantId: restaurants[1]._id,
+                name: "Family Feast Combo",
+                image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=500",
+                description: "8 pieces chicken, 4 burgers, 4 fries and 4 drinks.",
+                price: 2200,
+                category: "Combo",
+                rating: 4.7,
+                isPopular: true,
             }
         );
 
@@ -165,6 +220,7 @@ const seedData = async () => {
                 price: 500,
                 category: "Burger",
                 rating: 4.5,
+                isPopular: false,
             },
             {
                 restaurantId: restaurants[2]._id,
@@ -174,6 +230,17 @@ const seedData = async () => {
                 price: 150,
                 category: "Sides",
                 rating: 4.4,
+                isPopular: false,
+            },
+            {
+                restaurantId: restaurants[2]._id,
+                name: "Double Whopper Combo",
+                image: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=500",
+                description: "Double beef patty whopper with large fries and drink.",
+                price: 950,
+                category: "Combo",
+                rating: 4.8,
+                isPopular: true,
             }
         );
 
@@ -197,6 +264,7 @@ const seedData = async () => {
                 price: 450,
                 category: "Noodles",
                 rating: 4.7,
+                isPopular: true,
             },
             {
                 restaurantId: restaurants[3]._id,
@@ -206,6 +274,17 @@ const seedData = async () => {
                 price: 250,
                 category: "Appetizer",
                 rating: 4.5,
+                isPopular: false,
+            },
+            {
+                restaurantId: restaurants[3]._id,
+                name: "Ramen Bowl",
+                image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500",
+                description: "Rich broth ramen with soft boiled egg and chashu pork.",
+                price: 550,
+                category: "Noodles",
+                rating: 4.8,
+                isPopular: true,
             }
         );
 
@@ -239,16 +318,139 @@ const seedData = async () => {
                 price: 400,
                 category: "Sandwich",
                 rating: 4.6,
+                isPopular: false,
+            },
+            {
+                restaurantId: restaurants[4]._id,
+                name: "Strawberry Waffle",
+                image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500",
+                description: "Crispy waffle topped with fresh strawberries and whipped cream.",
+                price: 380,
+                category: "Dessert",
+                rating: 4.7,
+                isPopular: true,
+            }
+        );
+
+        // Momo Palace Foods
+        foods.push(
+            {
+                restaurantId: restaurants[5]._id,
+                name: "Steamed Chicken Momo",
+                image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500",
+                description: "Juicy chicken momos steamed to perfection with achar.",
+                price: 180,
+                category: "Momo",
+                rating: 4.9,
+                isPopular: true,
+            },
+            {
+                restaurantId: restaurants[5]._id,
+                name: "Jhol Momo",
+                image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500",
+                description: "Soft momos dipped in spicy sesame soup broth.",
+                price: 220,
+                category: "Momo",
+                rating: 4.8,
+                isPopular: true,
+            },
+            {
+                restaurantId: restaurants[5]._id,
+                name: "Fried Momo",
+                image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500",
+                description: "Crispy fried momos with tangy tomato achar.",
+                price: 200,
+                category: "Momo",
+                rating: 4.7,
+                isPopular: true,
+            },
+            {
+                restaurantId: restaurants[5]._id,
+                name: "Buff Momo",
+                image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500",
+                description: "Traditional buff filled momos, a Nepali classic.",
+                price: 160,
+                category: "Momo",
+                rating: 4.6,
+                isPopular: false,
+            }
+        );
+
+        // Sushi World Foods
+        foods.push(
+            {
+                restaurantId: restaurants[6]._id,
+                name: "Salmon Sushi Roll",
+                image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500",
+                description: "Fresh salmon with avocado and cucumber in sushi rice.",
+                price: 650,
+                category: "Sushi",
+                rating: 4.8,
+                isPopular: true,
+            },
+            {
+                restaurantId: restaurants[6]._id,
+                name: "Chicken Ramen",
+                image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500",
+                description: "Classic Japanese ramen with chicken broth and soft egg.",
+                price: 580,
+                category: "Ramen",
+                rating: 4.7,
+                isPopular: true,
+            },
+            {
+                restaurantId: restaurants[6]._id,
+                name: "Dragon Roll",
+                image: "https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=500",
+                description: "Tempura shrimp topped with avocado and spicy mayo.",
+                price: 750,
+                category: "Sushi",
+                rating: 4.9,
+                isPopular: true,
+            }
+        );
+
+        // The Grill House Foods
+        foods.push(
+            {
+                restaurantId: restaurants[7]._id,
+                name: "BBQ Beef Ribs",
+                image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500",
+                description: "Slow-smoked beef ribs with signature BBQ glaze.",
+                price: 1200,
+                category: "BBQ",
+                rating: 4.8,
+                isPopular: true,
+            },
+            {
+                restaurantId: restaurants[7]._id,
+                name: "Grilled Chicken Steak",
+                image: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=500",
+                description: "Juicy grilled chicken with garlic butter and herbs.",
+                price: 850,
+                category: "Grill",
+                rating: 4.6,
+                isPopular: true,
+            },
+            {
+                restaurantId: restaurants[7]._id,
+                name: "Mixed Grill Platter",
+                image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500",
+                description: "A mix of grilled chicken, beef, and lamb with sides.",
+                price: 1800,
+                category: "Grill",
+                rating: 4.9,
+                isPopular: true,
             }
         );
 
         await FoodModel.insertMany(foods);
 
-        console.log(" Foods created:", foods.length);
-        console.log(" Database seeded successfully!");
+        console.log("✅ Foods created:", foods.length);
+        console.log("✅ Database seeded successfully!");
         process.exit(0);
     } catch (error) {
-        console.error(" Error seeding database:", error);
+        console.error("❌ Error seeding database:", error);
         process.exit(1);
     }
 };
