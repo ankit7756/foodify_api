@@ -9,6 +9,8 @@ import restaurantRoutes from "./routes/restaurant.route";
 import foodRoutes from "./routes/food.route";
 import orderRoutes from "./routes/order.route";
 import adminUserRoutes from "./routes/admin/user.route";
+import paymentRoutes from "./routes/payment.route";
+
 
 const app: Application = express();
 
@@ -29,6 +31,8 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/foods', foodRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/payment', paymentRoutes);
+
 
 app.get('/', (req: Request, res: Response) => {
     return res.status(200).json({
