@@ -244,7 +244,7 @@ export const getOrderById = async (req: Request, res: Response) => {
         const { id } = req.params;
         const userId = (req as any).userId;
         const order = await OrderModel.findOne({ _id: id, userId })
-            .populate("restaurantId", "name image rating phone address");
+            .populate("restaurantId", "_id name image rating phone address")
         if (!order) return res.status(404).json({ success: false, message: "Order not found" });
         res.status(200).json({ success: true, data: order });
     } catch (error: any) {
