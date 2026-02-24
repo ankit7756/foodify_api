@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
 import { HttpError } from './errors/http-error';
+import reviewRoutes from "./routes/review.route";
 
 // Import routes
 import authRoutes from "./routes/auth.route";
@@ -32,6 +33,8 @@ app.use('/api/foods', foodRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/reviews', reviewRoutes);
+
 
 
 app.get('/', (req: Request, res: Response) => {
