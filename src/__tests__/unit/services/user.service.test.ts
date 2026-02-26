@@ -1,9 +1,9 @@
 // Unit tests for services/user.service.ts
 // Repository functions are mocked — no DB connection needed for these tests
 
-jest.mock('../../repositories/user.repository');
+jest.mock('../../../repositories/user.repository');
 // Mock email so sendEmail never actually tries to connect to Gmail
-jest.mock('../../config/email', () => ({
+jest.mock('../../../config/email', () => ({
     sendEmail: jest.fn().mockResolvedValue(undefined),
     transporter: { verify: jest.fn() },
 }));
@@ -162,7 +162,7 @@ describe('User Service Unit Tests', () => {
 
             const result = await userService.sendResetPasswordEmail('john@example.com');
 
-            const { sendEmail } = require('../../config/email');
+            const { sendEmail } = require('../../../config/email');
             expect(sendEmail).toHaveBeenCalledTimes(1);
             expect(result).toHaveProperty('email', 'john@example.com');
         });

@@ -165,10 +165,10 @@ describe('Order Integration Tests', () => {
 
     // ── Confirm delivery ──────────────────────────────────────────────────────
 
-    describe('POST /api/orders/:id/confirm', () => {
+    describe('PUT /api/orders/:id/confirm', () => {
         test('should mark order as delivered', async () => {
             const res = await request(app)
-                .post(`/api/orders/${pendingOrderId}/confirm`)
+                .put(`/api/orders/${pendingOrderId}/confirm`)
                 .set('Authorization', `Bearer ${userToken}`);
 
             expect(res.status).toBe(200);
@@ -177,9 +177,8 @@ describe('Order Integration Tests', () => {
         });
 
         test('should return 400 when confirming already delivered order', async () => {
-            // confirmDelivery: if(order.status === "delivered") return 400
             const res = await request(app)
-                .post(`/api/orders/${deliveredOrderId}/confirm`)
+                .put(`/api/orders/${deliveredOrderId}/confirm`)
                 .set('Authorization', `Bearer ${userToken}`);
             expect(res.status).toBe(400);
         });
@@ -205,7 +204,7 @@ describe('Order Integration Tests', () => {
 
     // ── Cancel order ──────────────────────────────────────────────────────────
 
-    describe('POST /api/orders/:id/cancel', () => {
+    describe('PUT /api/orders/:id/cancel', () => {
         test('should cancel a pending order', async () => {
             const newOrder = await request(app)
                 .post('/api/orders')
@@ -213,7 +212,7 @@ describe('Order Integration Tests', () => {
                 .send(makeOrder(testRestaurantId));
 
             const res = await request(app)
-                .post(`/api/orders/${newOrder.body.data._id}/cancel`)
+                .put(`/api/orders/${newOrder.body.data._id}/cancel`)
                 .set('Authorization', `Bearer ${userToken}`);
 
             expect(res.status).toBe(200);
@@ -221,9 +220,8 @@ describe('Order Integration Tests', () => {
         });
 
         test('should return 400 when cancelling a delivered order', async () => {
-            // cancelOrder: if(status === "delivered") return 400
             const res = await request(app)
-                .post(`/api/orders/${deliveredOrderId}/cancel`)
+                .put(`/api/orders/${deliveredOrderId}/cancel`)
                 .set('Authorization', `Bearer ${userToken}`);
             expect(res.status).toBe(400);
         });
