@@ -48,8 +48,6 @@ describe('Password Reset Integration Tests', () => {
 
                 expect(resetRequest.status).toBe(200);
 
-                // In real scenario, token would come from email
-                // For testing, we'll generate a valid token
                 const jwt = require('jsonwebtoken');
                 const user = await UserModel.findOne({ email: testUser.email });
                 const token = jwt.sign({ id: user?._id }, process.env.JWT_SECRET || 'foodify_secret_key', { expiresIn: '1h' });
