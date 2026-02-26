@@ -15,7 +15,6 @@ export const LoginSchema = z.object({
     password: z.string().min(1, "Password is required"),
 });
 
-// 🆕 UPDATE DTO - All fields optional for updates
 export const UpdateUserSchema = z.object({
     fullName: z.string().min(1).optional(),
     username: z.string().min(3).optional(),

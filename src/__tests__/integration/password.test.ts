@@ -2,14 +2,21 @@ import request from 'supertest';
 import app from '../../app';
 import { UserModel } from '../../models/User.model';
 
+// ✅ Mock BEFORE any imports that use nodemailer — stops real email + prevents timeout
+jest.mock('nodemailer', () => ({
+    createTransport: jest.fn().mockReturnValue({
+        sendMail: jest.fn().mockResolvedValue({ messageId: 'mock-id' }),
+        verify: jest.fn(),
+    }),
+}));
+
 describe('Password Reset Integration Tests', () => {
     const testUser = {
-        username: 'resetuser',
-        email: 'reset@test.com',
+        username: 'resetpwuser',
+        email: 'resetpw@test.com',
         password: 'Password123!',
-        confirmPassword: 'Password123!',
-        fullName: 'Reset User',
-        phone: '6666666666'
+        fullName: 'Reset PW User',
+        phone: '9800000050'
     };
 
     beforeAll(async () => {
@@ -21,54 +28,121 @@ describe('Password Reset Integration Tests', () => {
         await UserModel.deleteMany({ email: testUser.email });
     });
 
+    // ── Request reset email ───────────────────────────────────────────────────
+
     describe('POST /api/auth/request-password-reset', () => {
-        test('should request password reset', async () => {
-            const response = await request(app)
+        test('should return 200 for a registered email', async () => {
+            const res = await request(app)
                 .post('/api/auth/request-password-reset')
                 .send({ email: testUser.email });
 
-            expect(response.status).toBe(200);
-            expect(response.body).toHaveProperty('success', true);
-        }, 10000); // ✅ FIXED: 10 second timeout for email sending
-
-        test('should handle non-existent email', async () => {
-            const response = await request(app)
-                .post('/api/auth/request-password-reset')
-                .send({ email: 'nonexistent@test.com' });
-
-            expect(response.status).toBe(404);
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
         });
 
-        describe('POST /api/auth/reset-password/:token', () => {
-            test('should reset password with valid token', async () => {
-                // First request a reset
-                const resetRequest = await request(app)
-                    .post('/api/auth/request-password-reset')
-                    .send({ email: testUser.email });
+        test('should return 404 for an unregistered email', async () => {
+            const res = await request(app)
+                .post('/api/auth/request-password-reset')
+                .send({ email: 'ghost@nowhere.com' });
 
-                expect(resetRequest.status).toBe(200);
+            // user.service.ts throws HttpError(404) → controller returns 404
+            expect(res.status).toBe(404);
+            expect(res.body.success).toBe(false);
+        });
 
-                const jwt = require('jsonwebtoken');
-                const user = await UserModel.findOne({ email: testUser.email });
-                const token = jwt.sign({ id: user?._id }, process.env.JWT_SECRET || 'foodify_secret_key', { expiresIn: '1h' });
+        test('should return error when email field is missing', async () => {
+            const res = await request(app)
+                .post('/api/auth/request-password-reset')
+                .send({});
 
-                // Now reset password
-                const response = await request(app)
-                    .post(`/api/auth/reset-password/${token}`)
-                    .send({ newPassword: 'NewPassword123!' });
+            // service throws HttpError(400, "Email is required")
+            expect([400, 404]).toContain(res.status);
+        });
+    });
 
-                expect(response.status).toBe(200);
-                expect(response.body).toHaveProperty('success', true);
-            }, 10000);
+    // ── Reset via JWT token ───────────────────────────────────────────────────
 
-            test('should not reset password with invalid token', async () => {
-                const response = await request(app)
-                    .post('/api/auth/reset-password/invalid-token')
-                    .send({ newPassword: 'NewPassword123!' });
+    describe('POST /api/auth/reset-password/:token', () => {
+        test('should reset password with a valid signed JWT', async () => {
+            const jwt = require('jsonwebtoken');
+            const user = await UserModel.findOne({ email: testUser.email });
+            // service uses { id: user._id }  (not userId)
+            const token = jwt.sign(
+                { id: user!._id },
+                process.env.JWT_SECRET || 'foodify_secret_key',
+                { expiresIn: '1h' }
+            );
 
-                expect(response.status).toBe(400);
-                expect(response.body).toHaveProperty('success', false);
-            });
+            const res = await request(app)
+                .post(`/api/auth/reset-password/${token}`)
+                .send({ newPassword: 'NewPassword123!' });
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+        });
+
+        test('should return 400 for an invalid token string', async () => {
+            const res = await request(app)
+                .post('/api/auth/reset-password/this-is-not-a-jwt')
+                .send({ newPassword: 'NewPassword123!' });
+
+            // resetPassword() catches jwt.verify error → throws HttpError(400)
+            expect(res.status).toBe(400);
+            expect(res.body.success).toBe(false);
+        });
+
+        test('should return 400 for an expired token', async () => {
+            const jwt = require('jsonwebtoken');
+            const expired = jwt.sign(
+                { id: 'someid' },
+                process.env.JWT_SECRET || 'foodify_secret_key',
+                { expiresIn: '-1s' }
+            );
+
+            const res = await request(app)
+                .post(`/api/auth/reset-password/${expired}`)
+                .send({ newPassword: 'NewPassword123!' });
+
+            expect(res.status).toBe(400);
+        });
+    });
+
+    // ── Direct reset (mobile / no-email flow) ─────────────────────────────────
+
+    describe('POST /api/auth/reset-password-direct', () => {
+        test('should reset password directly with valid email', async () => {
+            const res = await request(app)
+                .post('/api/auth/reset-password-direct')
+                .send({ email: testUser.email, newPassword: 'DirectNew123!' });
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+        });
+
+        test('should return 404 for an unknown email', async () => {
+            const res = await request(app)
+                .post('/api/auth/reset-password-direct')
+                .send({ email: 'unknown@test.com', newPassword: 'DirectNew123!' });
+
+            expect(res.status).toBe(404);
+            expect(res.body.success).toBe(false);
+        });
+
+        test('should return 400 when newPassword is shorter than 6 chars', async () => {
+            const res = await request(app)
+                .post('/api/auth/reset-password-direct')
+                .send({ email: testUser.email, newPassword: '123' });
+
+            expect(res.status).toBe(400);
+            expect(res.body.success).toBe(false);
+        });
+
+        test('should return 400 when newPassword field is missing', async () => {
+            const res = await request(app)
+                .post('/api/auth/reset-password-direct')
+                .send({ email: testUser.email });
+
+            expect(res.status).toBe(400);
         });
     });
 });

@@ -69,7 +69,6 @@ export const loginUser = async (data: LoginInput) => {
     };
 };
 
-// ✅ NEW: Password reset email
 export const sendResetPasswordEmail = async (email?: string) => {
     if (!email) {
         throw new HttpError(400, "Email is required");
@@ -101,7 +100,6 @@ export const sendResetPasswordEmail = async (email?: string) => {
     return user;
 };
 
-// ✅ NEW: Reset password
 export const resetPassword = async (token?: string, newPassword?: string) => {
     try {
         if (!token || !newPassword) {

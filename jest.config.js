@@ -14,7 +14,6 @@ module.exports = {
     moduleNameMapper: {
         "^uuid$": "<rootDir>/src/__tests__/__mocks__/uuid.js",
     },
-    // ✅ ADD THIS
     globals: {
         'ts-jest': {
             tsconfig: {
