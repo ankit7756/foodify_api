@@ -6,7 +6,11 @@ import fs from "fs";
 
 const formatFood = (food: any) => ({
     ...food.toObject(),
-    image: food.image ? `${BASE_URL}/uploads/foods/${food.image}` : null,
+    image: food.image
+        ? food.image.startsWith("http")
+            ? food.image  // already a full URL (Unsplash, etc.)
+            : `${BASE_URL}/uploads/foods/${food.image}`
+        : null,
 });
 
 export class AdminFoodController {
@@ -80,7 +84,8 @@ export class AdminFoodController {
 
             const data = { ...req.body };
             if (req.file) {
-                if (food.image) {
+                // Only delete old file if it's a local file, not an external URL
+                if (food.image && !food.image.startsWith("http")) {
                     const oldPath = path.join(__dirname, "../../../uploads/foods", food.image);
                     if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
                 }
@@ -102,10 +107,12 @@ export class AdminFoodController {
             const food = await FoodModel.findById(req.params.id);
             if (!food) return res.status(404).json({ success: false, message: "Food not found" });
 
-            if (food.image) {
+            // Only delete local files, not external URLs
+            if (food.image && !food.image.startsWith("http")) {
                 const imgPath = path.join(__dirname, "../../../uploads/foods", food.image);
                 if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
             }
+
             await FoodModel.findByIdAndDelete(req.params.id);
             return res.status(200).json({ success: true, message: "Food deleted" });
         } catch (error: any) {

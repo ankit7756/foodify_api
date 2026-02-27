@@ -4,6 +4,12 @@ import { BASE_URL } from "../../config";
 import path from "path";
 import fs from "fs";
 
+const formatImage = (image: string | null | undefined, folder: string): string | null => {
+    if (!image) return null;
+    if (image.startsWith("http")) return image; // already a full URL (Unsplash, etc.)
+    return `${BASE_URL}/uploads/${folder}/${image}`;
+};
+
 export class AdminRestaurantController {
 
     async getAllRestaurants(req: Request, res: Response) {
@@ -25,7 +31,7 @@ export class AdminRestaurantController {
 
             const formatted = restaurants.map((r) => ({
                 ...r.toObject(),
-                image: r.image ? `${BASE_URL}/uploads/restaurants/${r.image}` : null,
+                image: formatImage(r.image, "restaurants"),
             }));
 
             return res.status(200).json({
@@ -51,7 +57,7 @@ export class AdminRestaurantController {
                 success: true,
                 data: {
                     ...restaurant.toObject(),
-                    image: restaurant.image ? `${BASE_URL}/uploads/restaurants/${restaurant.image}` : null,
+                    image: formatImage(restaurant.image, "restaurants"),
                 },
             });
         } catch (error: any) {
@@ -74,7 +80,7 @@ export class AdminRestaurantController {
                 message: "Restaurant created",
                 data: {
                     ...restaurant.toObject(),
-                    image: `${BASE_URL}/uploads/restaurants/${restaurant.image}`,
+                    image: formatImage(restaurant.image, "restaurants"),
                 },
             });
         } catch (error: any) {
@@ -89,8 +95,8 @@ export class AdminRestaurantController {
 
             const data = { ...req.body };
             if (req.file) {
-                // Delete old image
-                if (restaurant.image) {
+                // Delete old image only if it's a local file (not an external URL)
+                if (restaurant.image && !restaurant.image.startsWith("http")) {
                     const oldPath = path.join(__dirname, "../../../uploads/restaurants", restaurant.image);
                     if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
                 }
@@ -106,7 +112,7 @@ export class AdminRestaurantController {
                 message: "Restaurant updated",
                 data: {
                     ...updated!.toObject(),
-                    image: updated!.image ? `${BASE_URL}/uploads/restaurants/${updated!.image}` : null,
+                    image: formatImage(updated!.image, "restaurants"),
                 },
             });
         } catch (error: any) {
@@ -119,7 +125,8 @@ export class AdminRestaurantController {
             const restaurant = await RestaurantModel.findById(req.params.id);
             if (!restaurant) return res.status(404).json({ success: false, message: "Restaurant not found" });
 
-            if (restaurant.image) {
+            // Only delete local files, not external URLs
+            if (restaurant.image && !restaurant.image.startsWith("http")) {
                 const imgPath = path.join(__dirname, "../../../uploads/restaurants", restaurant.image);
                 if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
             }
