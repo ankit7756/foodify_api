@@ -2,7 +2,6 @@ import request from 'supertest';
 import app from '../../app';
 import { UserModel } from '../../models/User.model';
 
-// ✅ Mock BEFORE any imports that use nodemailer — stops real email + prevents timeout
 jest.mock('nodemailer', () => ({
     createTransport: jest.fn().mockReturnValue({
         sendMail: jest.fn().mockResolvedValue({ messageId: 'mock-id' }),
@@ -28,8 +27,6 @@ describe('Password Reset Integration Tests', () => {
         await UserModel.deleteMany({ email: testUser.email });
     });
 
-    // ── Request reset email ───────────────────────────────────────────────────
-
     describe('POST /api/auth/request-password-reset', () => {
         test('should return 200 for a registered email', async () => {
             const res = await request(app)
@@ -44,8 +41,6 @@ describe('Password Reset Integration Tests', () => {
             const res = await request(app)
                 .post('/api/auth/request-password-reset')
                 .send({ email: 'ghost@nowhere.com' });
-
-            // user.service.ts throws HttpError(404) → controller returns 404
             expect(res.status).toBe(404);
             expect(res.body.success).toBe(false);
         });
@@ -55,18 +50,14 @@ describe('Password Reset Integration Tests', () => {
                 .post('/api/auth/request-password-reset')
                 .send({});
 
-            // service throws HttpError(400, "Email is required")
             expect([400, 404]).toContain(res.status);
         });
     });
-
-    // ── Reset via JWT token ───────────────────────────────────────────────────
 
     describe('POST /api/auth/reset-password/:token', () => {
         test('should reset password with a valid signed JWT', async () => {
             const jwt = require('jsonwebtoken');
             const user = await UserModel.findOne({ email: testUser.email });
-            // service uses { id: user._id }  (not userId)
             const token = jwt.sign(
                 { id: user!._id },
                 process.env.JWT_SECRET || 'foodify_secret_key',
@@ -86,7 +77,6 @@ describe('Password Reset Integration Tests', () => {
                 .post('/api/auth/reset-password/this-is-not-a-jwt')
                 .send({ newPassword: 'NewPassword123!' });
 
-            // resetPassword() catches jwt.verify error → throws HttpError(400)
             expect(res.status).toBe(400);
             expect(res.body.success).toBe(false);
         });
@@ -106,8 +96,6 @@ describe('Password Reset Integration Tests', () => {
             expect(res.status).toBe(400);
         });
     });
-
-    // ── Direct reset (mobile / no-email flow) ─────────────────────────────────
 
     describe('POST /api/auth/reset-password-direct', () => {
         test('should reset password directly with valid email', async () => {

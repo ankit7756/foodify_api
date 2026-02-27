@@ -60,8 +60,6 @@ describe('Food Integration Tests', () => {
         await FoodModel.deleteMany({ restaurantId: testRestaurantId });
     });
 
-    // ── Public routes (food.controller.ts) ───────────────────────────────────
-
     describe('GET /api/foods', () => {
         test('should return all available foods', async () => {
             const res = await request(app).get('/api/foods');
@@ -99,14 +97,11 @@ describe('Food Integration Tests', () => {
         });
 
         test('should return 404 for non-existent food', async () => {
-            // getFoodById: if(!food) return 404
             const res = await request(app)
                 .get('/api/foods/000000000000000000000000');
             expect(res.status).toBe(404);
         });
     });
-
-    // ── Admin routes (AdminFoodController) ───────────────────────────────────
 
     describe('GET /api/admin/foods', () => {
         test('should get all foods with pagination as admin', async () => {
@@ -170,7 +165,6 @@ describe('Food Integration Tests', () => {
 
     describe('PUT /api/admin/foods/:id', () => {
         test('should update food price as admin', async () => {
-            // AdminFoodController.updateFood — parses price as parseFloat
             const res = await request(app)
                 .put(`/api/admin/foods/${testFoodId}`)
                 .set('Authorization', `Bearer ${adminToken}`)

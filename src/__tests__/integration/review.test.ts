@@ -67,8 +67,6 @@ describe('Review Integration Tests', () => {
         await ReviewModel.deleteMany({ restaurantName: 'Review Test Restaurant' });
     });
 
-    // ── Submit review ─────────────────────────────────────────────────────────
-
     describe('POST /api/reviews/order/:orderId', () => {
         test('should submit a review for a delivered order', async () => {
             const res = await request(app)
@@ -108,8 +106,6 @@ describe('Review Integration Tests', () => {
         });
     });
 
-    // ── Get my reviews ────────────────────────────────────────────────────────
-
     describe('GET /api/reviews/my', () => {
         test('should return all reviews submitted by current user', async () => {
             const res = await request(app)
@@ -128,8 +124,6 @@ describe('Review Integration Tests', () => {
         });
     });
 
-    // ── Get review by order ───────────────────────────────────────────────────
-
     describe('GET /api/reviews/order/:orderId', () => {
         test('should return the review for a specific order', async () => {
             const res = await request(app)
@@ -140,8 +134,6 @@ describe('Review Integration Tests', () => {
             expect(res.body.success).toBe(true);
         });
     });
-
-    // ── Admin reviews ─────────────────────────────────────────────────────────
 
     describe('GET /api/admin/reviews', () => {
         test('should return all reviews with pagination as admin', async () => {

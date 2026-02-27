@@ -19,8 +19,6 @@ describe('Auth Integration Tests', () => {
         await UserModel.deleteMany({ email: testUser.email });
     });
 
-    // ── Register ──────────────────────────────────────────────────────────────
-
     describe('POST /api/auth/register', () => {
         test('should register a new user and return user data', async () => {
             const res = await request(app)
@@ -51,7 +49,6 @@ describe('Auth Integration Tests', () => {
                     email: 'nofull@example.com',
                     password: 'Password123!',
                     phone: '9800000002'
-                    // fullName missing
                 });
 
             expect(res.status).toBe(400);
@@ -83,8 +80,6 @@ describe('Auth Integration Tests', () => {
         });
     });
 
-    // ── Login ─────────────────────────────────────────────────────────────────
-
     describe('POST /api/auth/login', () => {
         test('should login with correct credentials and return a JWT', async () => {
             const res = await request(app)
@@ -94,7 +89,6 @@ describe('Auth Integration Tests', () => {
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
             expect(res.body).toHaveProperty('token');
-            // JWT has three dot-separated parts
             expect(res.body.token.split('.').length).toBe(3);
             expect(res.body.user.email).toBe(testUser.email);
         });
@@ -126,8 +120,6 @@ describe('Auth Integration Tests', () => {
         });
     });
 
-    // ── Get Profile ───────────────────────────────────────────────────────────
-
     describe('GET /api/auth/profile', () => {
         let token: string;
 
@@ -146,7 +138,6 @@ describe('Auth Integration Tests', () => {
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
             expect(res.body.data.email).toBe(testUser.email);
-            // password must never appear
             expect(res.body.data).not.toHaveProperty('password');
         });
 
@@ -169,8 +160,6 @@ describe('Auth Integration Tests', () => {
             expect(res.status).toBe(401);
         });
     });
-
-    // ── Update Profile ────────────────────────────────────────────────────────
 
     describe('PUT /api/auth/profile', () => {
         let token: string;

@@ -23,7 +23,6 @@ describe('Restaurant Integration Tests', () => {
             .send({ email: 'radmin@test.com', password: 'Admin123!' });
         adminToken = al.body.token;
 
-        // Regular user
         await request(app).post('/api/auth/register').send({
             username: 'ruser', email: 'ruser@test.com',
             password: 'User123!', fullName: 'Rest User', phone: '9800001002'
@@ -32,7 +31,6 @@ describe('Restaurant Integration Tests', () => {
             .send({ email: 'ruser@test.com', password: 'User123!' });
         userToken = ul.body.token;
 
-        // Seed a restaurant directly (admin create requires image via multer)
         const r = await RestaurantModel.create({
             name: 'Integration Test Restaurant',
             description: 'Used in integration tests',
@@ -51,8 +49,6 @@ describe('Restaurant Integration Tests', () => {
         await UserModel.deleteMany({ email: { $in: ['radmin@test.com', 'ruser@test.com'] } });
         await RestaurantModel.deleteMany({ name: { $in: ['Integration Test Restaurant', 'Temp To Delete'] } });
     });
-
-    // ── Public routes (restaurant.controller.ts) ──────────────────────────────
 
     describe('GET /api/restaurants', () => {
         test('should return open restaurants for any visitor', async () => {
@@ -81,7 +77,6 @@ describe('Restaurant Integration Tests', () => {
         });
 
         test('should return 404 for non-existent id', async () => {
-            // restaurant.controller.ts returns 404 for missing restaurant
             const res = await request(app)
                 .get('/api/restaurants/000000000000000000000000');
             expect(res.status).toBe(404);
@@ -97,13 +92,10 @@ describe('Restaurant Integration Tests', () => {
         });
 
         test('should return 400 when query param is missing', async () => {
-            // searchRestaurants controller: if(!query) return 400
             const res = await request(app).get('/api/restaurants/search');
             expect(res.status).toBe(400);
         });
     });
-
-    // ── Admin routes (AdminRestaurantController) ──────────────────────────────
 
     describe('GET /api/admin/restaurants', () => {
         test('should return all restaurants with pagination as admin', async () => {

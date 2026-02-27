@@ -48,8 +48,6 @@ describe('Admin Users Integration Tests', () => {
         });
     });
 
-    // ── GET all users ─────────────────────────────────────────────────────────
-
     describe('GET /api/admin/users', () => {
         test('should get all users as admin', async () => {
             const res = await request(app)
@@ -94,8 +92,6 @@ describe('Admin Users Integration Tests', () => {
         });
     });
 
-    // ── POST create user ──────────────────────────────────────────────────────
-
     describe('POST /api/admin/users', () => {
         test('should create a new user as admin', async () => {
             const res = await request(app)
@@ -123,7 +119,6 @@ describe('Admin Users Integration Tests', () => {
         });
 
         test('should return 403 when creating with duplicate email', async () => {
-            // AdminUserService throws HttpError(403, "Email already in use")
             const res = await request(app)
                 .post('/api/admin/users')
                 .set('Authorization', `Bearer ${adminToken}`)
@@ -137,8 +132,6 @@ describe('Admin Users Integration Tests', () => {
             expect(res.status).toBe(403);
         });
     });
-
-    // ── GET single user ───────────────────────────────────────────────────────
 
     describe('GET /api/admin/users/:id', () => {
         test('should get a single user by id as admin', async () => {
@@ -165,8 +158,6 @@ describe('Admin Users Integration Tests', () => {
         });
     });
 
-    // ── PUT update user ───────────────────────────────────────────────────────
-
     describe('PUT /api/admin/users/:id', () => {
         test('should update a user as admin', async () => {
             const res = await request(app)
@@ -186,8 +177,6 @@ describe('Admin Users Integration Tests', () => {
             expect(res.status).toBe(403);
         });
     });
-
-    // ── DELETE user ───────────────────────────────────────────────────────────
 
     describe('DELETE /api/admin/users/:id', () => {
         test('should delete a user as admin', async () => {
@@ -213,8 +202,6 @@ describe('Admin Users Integration Tests', () => {
         });
     });
 
-    // ── Admin stats ───────────────────────────────────────────────────────────
-
     describe('GET /api/admin/stats', () => {
         test('should return platform-wide stats as admin', async () => {
             const res = await request(app)
@@ -223,7 +210,6 @@ describe('Admin Users Integration Tests', () => {
 
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
-            // Verify all stat fields from getAdminStats controller
             expect(res.body.data).toHaveProperty('totalUsers');
             expect(res.body.data).toHaveProperty('totalRestaurants');
             expect(res.body.data).toHaveProperty('totalFoods');

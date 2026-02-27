@@ -12,7 +12,6 @@ describe('Order Integration Tests', () => {
     let pendingOrderId: string;
     let deliveredOrderId: string;
 
-    // Reusable valid order payload
     const makeOrder = (restaurantId: string) => ({
         restaurantId,
         restaurantName: 'Order Test Restaurant',
@@ -69,8 +68,6 @@ describe('Order Integration Tests', () => {
         await OrderModel.deleteMany({ restaurantName: 'Order Test Restaurant' });
     });
 
-    // ── Create order ──────────────────────────────────────────────────────────
-
     describe('POST /api/orders', () => {
         test('should place a new order and return status pending', async () => {
             const res = await request(app)
@@ -92,7 +89,6 @@ describe('Order Integration Tests', () => {
         });
 
         test('should return 400 when required fields are missing', async () => {
-            // createOrder: checks restaurantId, restaurantName, items, subtotal, etc.
             const res = await request(app)
                 .post('/api/orders')
                 .set('Authorization', `Bearer ${userToken}`)
@@ -114,8 +110,6 @@ describe('Order Integration Tests', () => {
         });
     });
 
-    // ── Get current orders ────────────────────────────────────────────────────
-
     describe('GET /api/orders/current', () => {
         test('should return pending/preparing/out_for_delivery orders', async () => {
             const res = await request(app)
@@ -134,8 +128,6 @@ describe('Order Integration Tests', () => {
         });
     });
 
-    // ── Get order by id ───────────────────────────────────────────────────────
-
     describe('GET /api/orders/:id', () => {
         test('should get own order by id', async () => {
             const res = await request(app)
@@ -147,7 +139,6 @@ describe('Order Integration Tests', () => {
         });
 
         test('should return 404 when fetching another user\'s order', async () => {
-            // getOrderById uses findOne({ _id: id, userId }) — so another user gets 404
             await request(app).post('/api/auth/register').send({
                 username: 'stranger', email: 'stranger@test.com',
                 password: 'Str123456!', fullName: 'Stranger', phone: '9800003099'
@@ -162,8 +153,6 @@ describe('Order Integration Tests', () => {
             expect(res.status).toBe(404);
         });
     });
-
-    // ── Confirm delivery ──────────────────────────────────────────────────────
 
     describe('PUT /api/orders/:id/confirm', () => {
         test('should mark order as delivered', async () => {
@@ -184,8 +173,6 @@ describe('Order Integration Tests', () => {
         });
     });
 
-    // ── Get order history ─────────────────────────────────────────────────────
-
     describe('GET /api/orders/history', () => {
         test('should return delivered and cancelled orders only', async () => {
             const res = await request(app)
@@ -201,8 +188,6 @@ describe('Order Integration Tests', () => {
             });
         });
     });
-
-    // ── Cancel order ──────────────────────────────────────────────────────────
 
     describe('PUT /api/orders/:id/cancel', () => {
         test('should cancel a pending order', async () => {
@@ -226,8 +211,6 @@ describe('Order Integration Tests', () => {
             expect(res.status).toBe(400);
         });
     });
-
-    // ── Admin order routes ────────────────────────────────────────────────────
 
     describe('PUT /api/admin/orders/:id/status', () => {
         test('should update order status as admin', async () => {
@@ -292,7 +275,6 @@ describe('Order Integration Tests', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.status).toBe(200);
-            // Every returned order must be pending
             res.body.data.forEach((o: any) => {
                 expect(o.status).toBe('pending');
             });

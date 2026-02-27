@@ -1,8 +1,4 @@
-// Unit tests for services/user.service.ts
-// Repository functions are mocked — no DB connection needed for these tests
-
 jest.mock('../../../repositories/user.repository');
-// Mock email so sendEmail never actually tries to connect to Gmail
 jest.mock('../../../config/email', () => ({
     sendEmail: jest.fn().mockResolvedValue(undefined),
     transporter: { verify: jest.fn() },
@@ -11,7 +7,6 @@ jest.mock('../../../config/email', () => ({
 import * as userService from '../../../services/user.service';
 import * as userRepo from '../../../repositories/user.repository';
 
-// Cast the mocked module so TypeScript understands jest.fn()
 const mockedRepo = userRepo as jest.Mocked<typeof userRepo>;
 
 describe('User Service Unit Tests', () => {
@@ -19,8 +14,6 @@ describe('User Service Unit Tests', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
-
-    // ── registerUser ──────────────────────────────────────────────────────────
 
     describe('registerUser()', () => {
         const validInput = {
@@ -86,8 +79,6 @@ describe('User Service Unit Tests', () => {
         });
     });
 
-    // ── loginUser ─────────────────────────────────────────────────────────────
-
     describe('loginUser()', () => {
         const bcryptjs = require('bcryptjs');
 
@@ -137,8 +128,6 @@ describe('User Service Unit Tests', () => {
         });
     });
 
-    // ── sendResetPasswordEmail ────────────────────────────────────────────────
-
     describe('sendResetPasswordEmail()', () => {
         test('should throw HttpError 400 when email is undefined', async () => {
             await expect(userService.sendResetPasswordEmail(undefined))
@@ -167,8 +156,6 @@ describe('User Service Unit Tests', () => {
             expect(result).toHaveProperty('email', 'john@example.com');
         });
     });
-
-    // ── resetPassword ─────────────────────────────────────────────────────────
 
     describe('resetPassword()', () => {
         test('should throw HttpError 400 when token is undefined', async () => {
@@ -201,7 +188,6 @@ describe('User Service Unit Tests', () => {
             await userService.resetPassword(token, 'NewPass123!');
 
             const updateCall = mockedRepo.updateUser.mock.calls[0];
-            // stored password must be a bcrypt hash
             expect(updateCall[1].password).toMatch(/^\$2b\$/);
         });
     });

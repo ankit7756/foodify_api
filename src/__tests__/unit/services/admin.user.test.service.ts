@@ -1,6 +1,3 @@
-// Unit tests for services/admin/user.service.ts
-// Repository module is mocked — no DB needed
-
 jest.mock('../../../repositories/user.repository');
 
 import { AdminUserService } from '../../../services/admin/user.service';
