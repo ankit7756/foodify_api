@@ -13,7 +13,6 @@ describe('AdminUserService Unit Tests', () => {
         jest.clearAllMocks();
     });
 
-    // ── createUser ────────────────────────────────────────────────────────────
 
     describe('createUser()', () => {
         const userData = {
@@ -65,7 +64,6 @@ describe('AdminUserService Unit Tests', () => {
         });
     });
 
-    // ── getAllUsers ───────────────────────────────────────────────────────────
 
     describe('getAllUsers()', () => {
         test('should return users array and pagination metadata', async () => {
@@ -108,7 +106,6 @@ describe('AdminUserService Unit Tests', () => {
         });
     });
 
-    // ── getUserById ───────────────────────────────────────────────────────────
 
     describe('getUserById()', () => {
         test('should return user when found', async () => {
@@ -127,7 +124,6 @@ describe('AdminUserService Unit Tests', () => {
         });
     });
 
-    // ── updateUser ────────────────────────────────────────────────────────────
 
     describe('updateUser()', () => {
         test('should update and return the updated user', async () => {
@@ -147,7 +143,6 @@ describe('AdminUserService Unit Tests', () => {
         });
     });
 
-    // ── deleteUser ────────────────────────────────────────────────────────────
 
     describe('deleteUser()', () => {
         test('should return true on successful delete', async () => {
